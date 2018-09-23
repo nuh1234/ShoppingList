@@ -11,7 +11,8 @@ server.use(session({ secret: 'secret', resave: true, saveUninitialized: true }))
 server.use(parser.urlencoded({ extended: false }));
 server.use(parser.json());
 // References static files such as css and images, points directly to those folders
-server.use(express.static(path.join(__dirname, './static')));
+server.use(express.static(path.join(__dirname, './statics')));
+server.use(express.static(path.join(__dirname, 'public')));
 
 server.set('views', path.join(__dirname, './views'));
 
