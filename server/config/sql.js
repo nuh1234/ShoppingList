@@ -54,6 +54,34 @@ module.exports = {
             }
         }
         return false;
+    },
+    addItemForUser: (userid, item) => {
+        return new Promise((resolve, reject) => {
+            let query = `INSERT INTO userItems (item, ownerid, isDone) VALUES ('${item}', '${userid}', '0')`;
+            dataBase.query(query, (err, result) => {
+                if (err) {
+                    console.log(err.message);
+                    reject(false);
+                } else {
+                    console.log('added succesfully');
+                    resolve(true);
+                }
+            });     
+        });
+    },
+    getlistForUser: (userid) => {
+        return new Promise((resolve, reject) => {
+            let query = `SELECT * FROM userItems WHERE ownerid = '${userid}'`;
+            dataBase.query(query, (err, result) => {
+                if (err) {
+                    console.log(err.message);
+                    reject(false);
+                } else {
+                    console.log('Found List');
+                    resolve(result);
+                }
+            });     
+        });
     }
 }
 

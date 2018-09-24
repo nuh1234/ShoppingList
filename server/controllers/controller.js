@@ -1,5 +1,4 @@
 const dataBase = require('../config/sql');
-const list = ['item 1', 'item 2', 'item 3'];
 
 module.exports = {
     home: (request, response) => {
@@ -25,14 +24,15 @@ module.exports = {
         }
 
     },
-    listPage: (request, response) => {
-        response.render('todo', {data: list});
+    listPage: async (request, response) => {
+        let result = await dataBase.getlistForUser('0');
+        response.render('todo', {data: result});
     },
-    add: (request, response) => {
+    add: async (request, response) => {
         let input = request.body.added;
         if (!!input && input.length > 0) {
             console.log(input);
-            list.push(input)
+            await dataBase.addItemForUser('0', input);
         } 
         response.redirect('listPage');
     }
