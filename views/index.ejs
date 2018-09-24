@@ -9,12 +9,25 @@
         <script type="text/javascript" src="main.js"></script>
 </head>
     <body id="root">
-        <h1 class="login"> Welcome to Nuh's TODO's <h1>
-            <h3><%= page %></h3><br>
-            <form action="/login" method='POST'>
-                <h2>Log In<h2>
-                <input type="text">
+        <h1 class="title"> Welcome to Nuh's TODO's <h1>
+        <div class="buttonWrap">
+                <div class="mainButton" id="loginButton" onclick="showLogin();">Log In</div>
+                <div class="mainButton" id="createButton" onclick="showCreate();">Sign Up</div>
+        </div>
+        <form action="/login" method='POST' id="login" class="mainForm">
+            <input type="email" name="email" class="mainInput" placeholder="email" required>
+            <input type="password" name="password" class="mainInput" placeholder="password" required>
+            <div class="buttonWrap">
                 <input type="submit">
-        <form> 
+            </div>
+        </form> 
+        <form action="/create" method='POST' id="create" class="mainForm">
+            <input type="text" name="name" class="mainInput" placeholder="Your Name :)" required>
+            <input type="email" name="email" class="mainInput" placeholder="email" required>
+            <input type="password" name="password" class="mainInput" placeholder="password" required>
+            <div class="buttonWrap">
+                <input type="submit">
+            </div>
+        </form> 
     </body>
 </html>

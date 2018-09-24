@@ -22,12 +22,12 @@ module.exports = {
         let users = await getUsers(email);
         // We only create if the user doesn't exist
         if (users == false) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 let query = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`;
                 dataBase.query(query, (err, result) => {
                     if (err) {
                         console.log(err.message);
-                        reject(false);
+                        resolve(false);
                     } else {
                         console.log('Created succesfully');
                         resolve(true);
@@ -40,18 +40,22 @@ module.exports = {
     login: async (email, password) => {
         if (!!email && !!password) {
             let result = await getUsers(email);        
-            if (result) {
-                let foundPassword = result[0].password;
-                let foundUserEmail = result[0].email;
-                console.log(foundUserEmail);
-                console.log(foundPassword);
-                if (email === foundUserEmail && password === foundPassword) {
-                    // store user in session
-                    return true;
-                } else {
-                    return false;
+            return new Promise((resolve) => {
+                if (result) {
+                    let foundPassword = result[0].password;
+                    let foundUserEmail = result[0].email;
+                    console.log(foundUserEmail);
+                    console.log(foundPassword);
+                    if (email === foundUserEmail && password === foundPassword) {
+                        // store user in session
+                        console.log('match');
+                        resolve(true);
+                    } else {
+                        console.log(' no match');
+                        resolve(false);
+                    }
                 }
-            }
+            });
         }
         return false;
     },

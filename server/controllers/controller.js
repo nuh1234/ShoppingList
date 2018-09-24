@@ -4,19 +4,25 @@ module.exports = {
     home: (request, response) => {
         // TODO look at session stoarge for current user
         // Server side rendering of index page
-        response.render('index', { page:'Home uyubiybuygb' });
+        response.render('index', {  });
     },
     create: async (request, response) => {
         console.log('create');
-        let created = await dataBase.createUser('Nuh Mohamud', 'nuh1234@gmail.com', 'password');
+        let name = request.body.name;
+        let email = request.body.email;
+        let password = request.body.password;
+        let created = await dataBase.createUser(name, email, password);
         if (created) {
             response.redirect('listPage');
         } else {
             response.redirect('/');
         }
     },
-    login: (request, response) => {
-        let loggedIn = dataBase.login('nuh1234@gmail.com', 'password');
+    login: async (request, response) => {
+        let email = request.body.email;
+        let password = request.body.password;
+        let loggedIn = await dataBase.login(email, password);
+        console.log(loggedIn + "login");
         if (loggedIn) {
             response.redirect('listPage');
         } else {
