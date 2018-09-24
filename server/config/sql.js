@@ -18,96 +18,58 @@ dataBase.connect((err) => {
 global.dataBase = dataBase;
 
 module.exports = {
-    createUser: (name, email, password, callBack) => {
-        if (email && name && password) {
-            getUserForEmail(email, (user) => {            
-                if (typeof user === 'string') {
-                    let query = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`;
-                    dataBase.query(query, (err, result) => {
-                        if (err) {
-                            console.log(err.message);
-                            callBack(false);
-                        } else {
-                            console.log('Created succesfully');
-                            callBack(true);
-                        }
-                    });
-                } else {
-                    callBack(false);
-                }
-            });
-        } else {
-            callBack(false);
-        }
-    },
-    login: (email, password, callBack) => {
-        if (email && password) {
-            getUserForEmail(email, (result) => {
-                if (result) {
-                    let foundPassword = result[0].password;
-                    let foundUserEmail = result[0].email;
-                    console.log(foundUserEmail);
-                    console.log(foundPassword);
-                    if (email === foundUserEmail && password === foundPassword) {
-                        console.log('match');
-                        // store user in session
-                        callBack(true);
+    createUser: async (name, email, password) => {
+        let users = await getUsers(email);
+        // We only create if the user doesn't exist
+        if (users == false) {
+            return new Promise((resolve, reject) => {
+                let query = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`;
+                dataBase.query(query, (err, result) => {
+                    if (err) {
+                        console.log(err.message);
+                        reject(false);
                     } else {
-                        callBack(false);
+                        console.log('Created succesfully');
+                        resolve(true);
                     }
-                } 
+                });     
             });
-        } else {
-            callBack(false);
         }
+        return false;
     },
-    login2: async (email, password) => {
-        let result = await getUser(email);        
-        if (result) {
-            let foundPassword = result[0].password;
-            let foundUserEmail = result[0].email;
-            console.log(foundUserEmail);
-            console.log(foundPassword);
-            if (email === foundUserEmail && password === foundPassword) {
-                console.log('match');
-                // store user in session
-                return true;
-            } else {
-                return false;
+    login: async (email, password) => {
+        if (!!email && !!password) {
+            let result = await getUsers(email);        
+            if (result) {
+                let foundPassword = result[0].password;
+                let foundUserEmail = result[0].email;
+                console.log(foundUserEmail);
+                console.log(foundPassword);
+                if (email === foundUserEmail && password === foundPassword) {
+                    // store user in session
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
+        return false;
     }
 }
 
-function getUserForEmail(email, callBack) {
-    let query = `SELECT * FROM users WHERE email = '${email}'`;
-    dataBase.query(query, (err, result) => {
-        if (err) {
-            console.log(err.message);
-            // User doesn't exist
-            callBack(false);
-        } else {
-            console.log(result[0].email + " exists!");
-            // return user
-            callBack(result);
-        }
-    });
-}
-
-function getUser(email) {
+function getUsers(email) {
     return new Promise ((resolve, reject) => {
         let query = `SELECT * FROM users WHERE email = '${email}'`;
         dataBase.query(query, (err, result) => {
             if (err) {
-                console.log(err.message);
-                // User doesn't exist
+                // Error
                 reject(false);
             } else {
-                console.log(result[0].email + " exists!");
-                // return user
+                if (result.length == 0) {
+                    resolve(false);
+                }
                 resolve(result);
             }
         });
     });
-
 }

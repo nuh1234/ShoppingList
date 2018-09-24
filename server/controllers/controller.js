@@ -7,9 +7,9 @@ module.exports = {
         // Server side rendering of index page
         response.render('index', { page:'Home uyubiybuygb' });
     },
-    create: (request, response) => {
+    create: async (request, response) => {
         console.log('create');
-        let created = dataBase.createUser('Nuh Mohamud', 'nuh@gmail.com', 'password');
+        let created = await dataBase.createUser('Nuh Mohamud', 'nuh1234@gmail.com', 'password');
         if (created) {
             response.redirect('listPage');
         } else {
@@ -17,9 +17,7 @@ module.exports = {
         }
     },
     login: (request, response) => {
-        console.log('login');
-        let loggedIn = dataBase.login2('nuh@gmail.com', 'password');
-        
+        let loggedIn = dataBase.login('nuh1234@gmail.com', 'password');
         if (loggedIn) {
             response.redirect('listPage');
         } else {
