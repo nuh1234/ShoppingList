@@ -44,8 +44,6 @@ module.exports = {
                 if (result) {
                     let foundPassword = result[0].password;
                     let foundUserEmail = result[0].email;
-                    console.log(foundUserEmail);
-                    console.log(foundPassword);
                     if (email === foundUserEmail && password === foundPassword) {
                         // store user in session
                         console.log('match');

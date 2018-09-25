@@ -22,7 +22,6 @@ module.exports = {
         let email = request.body.email;
         let password = request.body.password;
         let loggedIn = await dataBase.login(email, password);
-        console.log(loggedIn + "login");
         if (loggedIn) {
             response.redirect('listPage');
         } else {
