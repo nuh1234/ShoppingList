@@ -19,9 +19,9 @@
                                 <input type="radio" id="<%= data[i].itemid%>" onclick="checkTask(this.id)"/>
                         </li>
                         <% } else{ %> 
-                            <li class="itemBoxChecked">
-                                    <p class="item"><%= data[i].item %></p>
-                                    <input type="radio" id="<%= data[i].itemid%>" onclick="checkTask(this.id)"/>
+                            <li class="itemBox">
+                                    <p class="isChecked"><%= data[i].item %></p>
+                                    <input type="radio" id="<%= data[i].itemid%>" checked="checked">
                             </li>  
                     <% } %>
                 <% } %>

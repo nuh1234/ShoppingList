@@ -59,7 +59,8 @@ module.exports = {
     },
     addItemForUser: (userid, item) => {
         return new Promise((resolve, reject) => {
-            let query = `INSERT INTO userItems (item, ownerid, isDone) VALUES ('${item}', '${userid}', '0')`;
+            let escapedItem = escapeSqlString(item);
+            let query = `INSERT INTO userItems (item, ownerid, isDone) VALUES ('${escapedItem}', '${userid}', '0')`;
             dataBase.query(query, (err, result) => {
                 if (err) {
                     console.log(err.message);
@@ -84,6 +85,20 @@ module.exports = {
                 }
             });     
         });
+    },
+    markTaskDone: (taskid) => {
+        return new Promise((resolve, reject) => {
+            let query = `UPDATE userItems SET isDone = 1 WHERE itemid = ${taskid}`;
+            dataBase.query(query, (err, result) => {
+                if (err) {
+                    console.log(err.message);
+                    reject(false);
+                } else {
+                    console.log('Updated Task');
+                    resolve(true);
+                }
+            });     
+        });
     }
 }
 
@@ -101,5 +116,29 @@ function getUsers(email) {
                 resolve(result);
             }
         });
+    });
+}
+
+function escapeSqlString (s) {
+    return s.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, (char) => {
+        switch (char) {
+            case "\0":
+                return "\\0";
+            case "\x08":
+                return "\\b";
+            case "\x09":
+                return "\\t";
+            case "\x1a":
+                return "\\z";
+            case "\n":
+                return "\\n";
+            case "\r":
+                return "\\r";
+            case "\"":
+            case "'":
+            case "\\":
+            case "%":
+                return "\\"+char;
+        }
     });
 }

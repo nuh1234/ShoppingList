@@ -40,5 +40,10 @@ module.exports = {
             await dataBase.addItemForUser('0', input);
         } 
         response.redirect('listPage');
+    },
+    taskDone: async (request, response) => {
+        console.log('ID was ' + request.body.id);
+        await dataBase.markTaskDone(request.body.id);
+        response.end();
     }
 }
