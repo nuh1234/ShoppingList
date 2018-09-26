@@ -10,7 +10,7 @@
 </head>
     <body id="root">
         <div class="todoContainer">
-        <h3> Welcome, Enter an item to the list </h3>
+        <h3> Welcome <%= name %>, add a todo below </h3>
             <ul>
                 <% for(var i=0; i < data.length; i++) { %>
                     <%if (data[i].isDone == 0) { %>

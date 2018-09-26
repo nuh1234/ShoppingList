@@ -1,8 +1,7 @@
 const dataBase = require('../config/sql');
-
+let currentUser;
 module.exports = {
     home: (request, response) => {
-        // TODO look at session stoarge for current user
         // Server side rendering of index page
         response.render('index', {  });
     },
@@ -13,6 +12,12 @@ module.exports = {
         let password = request.body.password;
         let created = await dataBase.createUser(name, email, password);
         if (created) {
+            let user = await dataBase.getUsers(email);
+            currentUser = {
+                name: user[0].name,
+                email: user[0].email,
+                id: user[0].id
+            }
             response.redirect('listPage');
         } else {
             response.redirect('/');
@@ -21,8 +26,13 @@ module.exports = {
     login: async (request, response) => {
         let email = request.body.email;
         let password = request.body.password;
-        let loggedIn = await dataBase.login(email, password);
-        if (loggedIn) {
+        let user = await dataBase.login(email, password);
+        if (user) {
+            currentUser = {
+                name: user.name,
+                email: user.email,
+                id: user.id
+            }
             response.redirect('listPage');
         } else {
             response.redirect('/');
@@ -30,14 +40,22 @@ module.exports = {
 
     },
     listPage: async (request, response) => {
-        let result = await dataBase.getlistForUser('0');
-        response.render('todo', {data: result});
+        if (currentUser) {
+            try {
+                let result = await dataBase.getlistForUser(currentUser.userid);
+                response.render('todo', { name:currentUser.name, data: result });
+            } catch (err) {
+                response.render('todo', { name:currentUser.name, data: '' });
+            }
+        } else {
+            response.redirect('/');
+        }
     },
     add: async (request, response) => {
         let input = request.body.added;
         if (!!input && input.length > 0) {
             console.log(input);
-            await dataBase.addItemForUser('0', input);
+            await dataBase.addItemForUser(currentUser.userid, input);
         } 
         response.redirect('listPage');
     },

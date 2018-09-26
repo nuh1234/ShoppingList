@@ -19,17 +19,20 @@ global.dataBase = dataBase;
 
 module.exports = {
     createUser: async (name, email, password) => {
-        let users = await getUsers(email);
+        let escapedName = escapeString(name);
+        let escapedEmail = escapeString(email);
+        let escapedPass = escapeString(password);
+
+        let users = await module.exports.getUsers(escapedEmail);
         // We only create if the user doesn't exist
         if (users == false) {
             return new Promise((resolve) => {
-                let query = `INSERT INTO users (name, email, password) VALUES ('${name}', '${email}', '${password}')`;
+                let query = `INSERT INTO users (name, email, password) VALUES ('${escapedName}', '${escapedEmail}', '${escapedPass}')`;
                 dataBase.query(query, (err, result) => {
                     if (err) {
                         console.log(err.message);
                         resolve(false);
                     } else {
-                        console.log('Created succesfully');
                         resolve(true);
                     }
                 });     
@@ -39,7 +42,8 @@ module.exports = {
     },
     login: async (email, password) => {
         if (!!email && !!password) {
-            let result = await getUsers(email);        
+            let escapedEmail = escapeString(email);
+            let result = await module.exports.getUsers(escapedEmail);        
             return new Promise((resolve) => {
                 if (result) {
                     let foundPassword = result[0].password;
@@ -47,9 +51,9 @@ module.exports = {
                     if (email === foundUserEmail && password === foundPassword) {
                         // store user in session
                         console.log('match');
-                        resolve(true);
+                        resolve(result[0]);
                     } else {
-                        console.log(' no match');
+                        console.log('no match');
                         resolve(false);
                     }
                 }
@@ -59,7 +63,7 @@ module.exports = {
     },
     addItemForUser: (userid, item) => {
         return new Promise((resolve, reject) => {
-            let escapedItem = escapeSqlString(item);
+            let escapedItem = escapeString(item);
             let query = `INSERT INTO userItems (item, ownerid, isDone) VALUES ('${escapedItem}', '${userid}', '0')`;
             dataBase.query(query, (err, result) => {
                 if (err) {
@@ -99,27 +103,28 @@ module.exports = {
                 }
             });     
         });
+    },
+
+    getUsers: (email) => {
+        return new Promise ((resolve, reject) => {
+            let query = `SELECT * FROM users WHERE email = '${email}'`;
+            dataBase.query(query, (err, result) => {
+                if (err) {
+                    // Error
+                    reject(false);
+                } else {
+                    if (result.length == 0) {
+                        resolve(false);
+                    }
+                    resolve(result);
+                }
+            });
+        });
     }
 }
 
-function getUsers(email) {
-    return new Promise ((resolve, reject) => {
-        let query = `SELECT * FROM users WHERE email = '${email}'`;
-        dataBase.query(query, (err, result) => {
-            if (err) {
-                // Error
-                reject(false);
-            } else {
-                if (result.length == 0) {
-                    resolve(false);
-                }
-                resolve(result);
-            }
-        });
-    });
-}
-
-function escapeSqlString (s) {
+//Regex found online for safely escaping sql strings, this avoids things like sql injection attacks
+function escapeString (s) {
     return s.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, (char) => {
         switch (char) {
             case "\0":
