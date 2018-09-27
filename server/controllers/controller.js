@@ -10,37 +10,44 @@ module.exports = {
         let name = request.body.name;
         let email = request.body.email;
         let password = request.body.password;
-        let created = await dataBase.createUser(name, email, password);
-        if (created) {
-            let user = await dataBase.getUsers(email);
-            let currentUser = {
-                name: user[0].name,
-                email: user[0].email,
-                userid: user[0].userid
-            };
-            request.session.user = currentUser;
-            console.log(`current user is ${request.session.user.userid}`);
-            response.redirect('listPage');
-        } else {
+        try {
+            let created = await dataBase.createUser(name, email, password);
+            if (created) {
+                let user = await dataBase.getUsers(email);
+                let currentUser = {
+                    name: user[0].name,
+                    email: user[0].email,
+                    userid: user[0].userid
+                };
+                request.session.user = currentUser;
+                console.log(`current user is ${request.session.user.userid}`);
+                response.redirect('listPage');
+            } else {
+                response.redirect('/');
+            }
+        } catch (err) {
             response.redirect('/');
         }
     },
     login: async (request, response) => {
         let email = request.body.email;
         let password = request.body.password;
-        let user = await dataBase.login(email, password);
-        if (user) {
-            let currentUser = {
-                name: user.name,
-                email: user.email,
-                userid: user.userid
-            };
-            request.session.user = currentUser;
-            response.redirect('listPage');
-        } else {
+        try {
+            let user = await dataBase.login(email, password);
+            if (user) {
+                let currentUser = {
+                    name: user.name,
+                    email: user.email,
+                    userid: user.userid
+                };
+                request.session.user = currentUser;
+                response.redirect('listPage');
+            } else {
+                response.redirect('/');
+            }
+        } catch (err) {
             response.redirect('/');
         }
-
     },
     listPage: async (request, response) => {
         if (request.session.user) {
@@ -70,7 +77,11 @@ module.exports = {
     },
     taskDone: async (request, response) => {
         console.log('ID was ' + request.body.id);
-        await dataBase.markTaskDone(request.body.id);
-        response.end();
+        try {
+            await dataBase.markTaskDone(request.body.id);
+            response.end();
+        } catch (err) {
+            response.end();
+        }
     }
 }
