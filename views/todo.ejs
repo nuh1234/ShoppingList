@@ -10,7 +10,7 @@
 </head>
     <body id="root">
         <div class="todoContainer">
-        <h3> Welcome <%= name %>, add a todo below </h3>
+        <h3> Hi <%= name %>, welcome to Nuh's TODO's</h3>
             <ul>
                 <% for(var i=0; i < data.length; i++) { %>
                     <%if (data[i].isDone == 0) { %>
@@ -31,6 +31,10 @@
                 <div style="height: 20px"></div>
                 <input type="submit">
             </form>
+            <div class="factBox">
+                <p>Enjoy a random fact about cats 😸 for every task you add!</p>
+                <p>Did you know that <%= fact %> </p>
+            </div>
         </div>
     </body>
 </html>

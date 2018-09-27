@@ -1,5 +1,5 @@
 const dataBase = require('../config/sql');
-let currentUser;
+const factsApi = require('../config/factsApi');
 module.exports = {
     home: (request, response) => {
         // Server side rendering of index page
@@ -13,11 +13,13 @@ module.exports = {
         let created = await dataBase.createUser(name, email, password);
         if (created) {
             let user = await dataBase.getUsers(email);
-            currentUser = {
+            let currentUser = {
                 name: user[0].name,
                 email: user[0].email,
-                id: user[0].id
-            }
+                userid: user[0].userid
+            };
+            request.session.user = currentUser;
+            console.log(`current user is ${request.session.user.userid}`);
             response.redirect('listPage');
         } else {
             response.redirect('/');
@@ -28,11 +30,12 @@ module.exports = {
         let password = request.body.password;
         let user = await dataBase.login(email, password);
         if (user) {
-            currentUser = {
+            let currentUser = {
                 name: user.name,
                 email: user.email,
-                id: user.id
-            }
+                userid: user.userid
+            };
+            request.session.user = currentUser;
             response.redirect('listPage');
         } else {
             response.redirect('/');
@@ -40,12 +43,14 @@ module.exports = {
 
     },
     listPage: async (request, response) => {
-        if (currentUser) {
+        if (request.session.user) {
             try {
-                let result = await dataBase.getlistForUser(currentUser.userid);
-                response.render('todo', { name:currentUser.name, data: result });
+                let factJson = await factsApi.getRandomFact();
+                let fact = JSON.parse(factJson);
+                let result = await dataBase.getlistForUser(request.session.user.userid);
+                response.render('todo', { name: request.session.user.name, fact: fact.string, data: result });
             } catch (err) {
-                response.render('todo', { name:currentUser.name, data: '' });
+                response.render('todo', { name: request.session.user.name, data: '' });
             }
         } else {
             response.redirect('/');
@@ -55,7 +60,11 @@ module.exports = {
         let input = request.body.added;
         if (!!input && input.length > 0) {
             console.log(input);
-            await dataBase.addItemForUser(currentUser.userid, input);
+            try {
+                await dataBase.addItemForUser(request.session.user.userid, input);
+            } catch (err) {
+                response.end();
+            }
         } 
         response.redirect('listPage');
     },

@@ -20,5 +20,5 @@ server.set('view engine', 'ejs');
 require('./server/config/routes.js')(server);
 
 server.listen(port, () => {
-    console.log('listening on port 5000');
+    console.log(`listening on port ${port}`);
 });

@@ -64,7 +64,7 @@ module.exports = {
     addItemForUser: (userid, item) => {
         return new Promise((resolve, reject) => {
             let escapedItem = escapeString(item);
-            let query = `INSERT INTO userItems (item, ownerid, isDone) VALUES ('${escapedItem}', '${userid}', '0')`;
+            let query = `INSERT INTO userItems (item, isDone, ownerid) VALUES ('${escapedItem}', '0', '${userid}')`;
             dataBase.query(query, (err, result) => {
                 if (err) {
                     console.log(err.message);
@@ -84,7 +84,7 @@ module.exports = {
                     console.log(err.message);
                     reject(false);
                 } else {
-                    console.log('Found List');
+                    console.log(`Found List for id ${userid} - ${result}`);
                     resolve(result);
                 }
             });     
@@ -123,7 +123,7 @@ module.exports = {
     }
 }
 
-//Regex found online for safely escaping sql strings, this avoids things like sql injection attacks
+//Regex found online for safely escaping sql strings, this helps avoid things like sql injection attacks
 function escapeString (s) {
     return s.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, (char) => {
         switch (char) {
