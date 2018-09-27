@@ -84,7 +84,6 @@ module.exports = {
                     console.log(err.message);
                     reject(false);
                 } else {
-                    console.log(`Found List for id ${userid} - ${result}`);
                     resolve(result);
                 }
             });     
